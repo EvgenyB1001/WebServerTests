@@ -17,6 +17,8 @@ public class HttpMethodController {
     {
         methods.add(new HttpMethodGet());
         methods.add(new HttpMethodPost());
+        methods.add(new HttpMethodPut());
+        methods.add(new HttpMethodDelete());
     }
 
     private HttpMethodController() {}

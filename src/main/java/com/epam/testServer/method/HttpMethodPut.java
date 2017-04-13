@@ -4,10 +4,14 @@ import com.epam.testServer.bean.Book;
 import com.epam.testServer.bean.Request;
 import com.epam.testServer.method.exception.MethodException;
 import com.epam.testServer.storage.Storage;
+import com.epam.testServer.storage.exception.StorageException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.w3c.dom.*;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -20,16 +24,16 @@ import java.io.StringReader;
 /**
  * Created by 777 on 13.04.2017.
  */
-public class HttpMethodPost extends HttpMethod {
+public class HttpMethodPut extends HttpMethod {
 
-    private static final String METHOD_NAME = "POST";
-    private static final String ROOT_PATH_TEXT = "/";
-    private static final String CONTENT_TYPE_ATTRIBUTE_NAME = "Content-type:";
+    private static final String METHOD_NAME = "PUT";
     private static final String ID_ATTRIBUTE_NAME = "id";
     private static final String TITLE_ATTRIBUTE_NAME = "title";
     private static final String AUTHOR_ATTRIBUTE_NAME = "author";
     private static final String GENRE_ATTRIBUTE_NAME = "genre";
+    private static final String CONTENT_TYPE_ATTRIBUTE_NAME = "Content-type:";
     private static final String CONTENT_TYPE_EXCEPTION_TEXT = "Content type isn't supported";
+    private static final String PAGE_REG_EXP = "/\\d+";
 
     @Override
     public String getMethodName() {
@@ -37,41 +41,45 @@ public class HttpMethodPost extends HttpMethod {
     }
 
     /**
-     * Method reads body of request and create new book. Only one book
-     * can be created per request
+     * Method reads body of request and updates book by its ID.
+     * Only one book can be updated per request
      */
     @Override
     public String executeMethod(Request request) {
         String response = request.getHttpVersion();
         try {
-            if (request.getPath().equals(ROOT_PATH_TEXT)) {
+            if (request.getPath().matches(PAGE_REG_EXP)) {
                 String body = request.getBody();
-                response += addBook(request, body);
+                response = updateBook(request, body);
             } else {
                 response += PAGE_NOT_FOUND_TEXT;
             }
         } catch (ParseException | ParserConfigurationException | SAXException | IOException e) {
             response += SERVER_ERROR_TEXT;
+        } catch (StorageException stEx) {
+            response += PAGE_NOT_FOUND_TEXT;
         } catch (MethodException methEx) {
             response += WRONG_ATTRIBUTES_TEXT;
         }
         return response;
     }
 
-    private String addBook(Request request, String body) throws ParseException,
-            ParserConfigurationException, SAXException, IOException, MethodException {
+    private String updateBook(Request request, String body) throws ParseException,
+            ParserConfigurationException, SAXException,
+            IOException, StorageException, MethodException {
 
         String response = null;
+        int bookId = Integer.parseInt(request.getPath()
+                .substring(request.getPath().indexOf(ROOT_PATH_TEXT) + 1));
+        Book book = Storage.getInstance().getBook(bookId);
         switch (request.getParameters().get(CONTENT_TYPE_ATTRIBUTE_NAME)) {
             case APPLICATION_JSON_TEXT: {
                 JSONParser parser = new JSONParser();
                 JSONObject jsonObj = (JSONObject) parser.parse(body);
-                Book book = new Book();
                 book.setId((int) jsonObj.get(ID_ATTRIBUTE_NAME));
                 book.setAuthor((String) jsonObj.get(AUTHOR_ATTRIBUTE_NAME));
                 book.setTitle((String) jsonObj.get(TITLE_ATTRIBUTE_NAME));
                 book.setGenre((String) jsonObj.get(GENRE_ATTRIBUTE_NAME));
-                Storage.getInstance().setBook(book);
                 response = CORRECT_ACTION_ANSWER_TEXT;
                 break;
             }
@@ -81,12 +89,10 @@ public class HttpMethodPost extends HttpMethod {
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 Document document = builder.parse(new InputSource(new StringReader(body)));
                 Element bookElement = document.getDocumentElement();
-                Book book = new Book();
                 book.setId(Integer.parseInt(bookElement.getAttribute(ID_ATTRIBUTE_NAME)));
                 book.setTitle(getSingleElement(bookElement, TITLE_ATTRIBUTE_NAME).getTextContent().trim());
                 book.setAuthor(getSingleElement(bookElement, AUTHOR_ATTRIBUTE_NAME).getTextContent().trim());
                 book.setGenre(getSingleElement(bookElement, GENRE_ATTRIBUTE_NAME).getTextContent().trim());
-                Storage.getInstance().setBook(book);
                 response = CORRECT_ACTION_ANSWER_TEXT;
                 break;
             }

@@ -54,6 +54,10 @@ public class Storage {
         return resultBook;
     }
 
+    public void deleteBook(int id) {
+        books.remove(id);
+    }
+
     @XmlElementWrapper(name = "books")
     @XmlElementRefs({
             @XmlElementRef(name = "book", type = Book.class, required = true)})

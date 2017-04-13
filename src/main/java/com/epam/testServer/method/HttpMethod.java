@@ -10,6 +10,7 @@ public abstract class HttpMethod {
     protected static final String PAGE_NOT_FOUND_TEXT = " 404 Page not found";
     protected static final String CORRECT_ACTION_ANSWER_TEXT = " 200 OK";
     protected static final String SERVER_ERROR_TEXT = " 500 Something go wrong";
+    protected static final String WRONG_ATTRIBUTES_TEXT = " 400 Wrong attributes";
     protected static final String APPLICATION_XML_TEXT = "application/xml";
     protected static final String APPLICATION_JSON_TEXT = "application/json";
     protected static final String ROOT_PATH_TEXT = "/";
