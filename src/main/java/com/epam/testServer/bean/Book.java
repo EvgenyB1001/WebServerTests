@@ -1,10 +1,16 @@
 package com.epam.testServer.bean;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 
 /**
  * Created by Yauheni_Borbut on 4/12/2017.
  */
+@XmlRootElement
+@XmlType(propOrder = {"title","author","genre"})
 public class Book implements Serializable {
 
     public static final long serialVersionUID = 1L;
@@ -15,6 +21,13 @@ public class Book implements Serializable {
     private String genre;
 
     public Book() {}
+
+    public Book(int id, String title, String author, String genre) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.genre = genre;
+    }
 
     public void setId(int id) {
         this.id = id;
@@ -32,18 +45,22 @@ public class Book implements Serializable {
         this.genre = genre;
     }
 
+    @XmlAttribute
     public int getId() {
         return id;
     }
 
+    @XmlElement
     public String getGenre() {
         return genre;
     }
 
+    @XmlElement
     public String getAuthor() {
         return author;
     }
 
+    @XmlElement
     public String getTitle() {
         return title;
     }

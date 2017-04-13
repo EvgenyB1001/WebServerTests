@@ -11,15 +11,16 @@ public class HTTPClient extends Thread {
         try
         {
             String targs[] = {"GET"};
-            Socket s = new Socket("127.0.0.1", 5000);
+            Socket s = new Socket("127.0.0.1", 8081);
 
             String request = targs[0] + " / HTTP/1.1\n" +
-                    "Accept: text/html, application/xhtml+xml, image/jxr, */*\n" +
-                    "Accept-Language: en-US\n" +
-                    "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393\n" +
+                    "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\n" +
+                    "Accept-Language: en-US,en;q=0.5\n" +
+                    "Content-type: application/json\n" +
+                    "User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0\n" +
                     "Accept-Encoding: gzip, deflate\n" +
-                    "Host: 127.0.0.1:5000\n" +
-                    "Connection: Keep-Alive";
+                    "Host: 127.0.0.1:8081\n" +
+                    "Connection: Keep-Alive\n";
             s.getOutputStream().write(request.getBytes());
 
             System.out.println();

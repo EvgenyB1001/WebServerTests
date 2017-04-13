@@ -17,16 +17,17 @@ public class RequestParser {
 
     private static final int METHOD_INDEX = 0;
     private static final int PATH_INDEX = 1;
+    private static final int HTTP_VERSION_INDEX = 2;
 
     public Request getRequest(InputStream input) throws IOException {
         Request request = new Request();
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         String header = readHTTPHeader(reader);
-        System.out.println(header);
         String headerLines[] = header.split(LINE_SEPARATOR);
         String[] firstLineParams = headerLines[0].split(PARAMETER_SEPARATOR);
         request.setMethod(firstLineParams[METHOD_INDEX]);
         request.setPath(firstLineParams[PATH_INDEX]);
+        request.setHttpVersion(firstLineParams[HTTP_VERSION_INDEX]);
         for(int i = 1; i < headerLines.length; i++) {
             String param = headerLines[i].substring(0, headerLines[i].indexOf(PARAMETER_SEPARATOR));
             String values = headerLines[i].substring(headerLines[i].indexOf(PARAMETER_SEPARATOR) + 1);
