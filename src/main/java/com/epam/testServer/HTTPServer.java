@@ -1,8 +1,11 @@
 package com.epam.testServer;
 
 import com.epam.testServer.bean.Request;
+import com.epam.testServer.bean.Response;
 import com.epam.testServer.method.HttpMethodController;
 import com.epam.testServer.utils.RequestParser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -21,6 +24,7 @@ public class HTTPServer {
 
     private static class SocketPerformer implements Runnable {
 
+        private static final Logger logger = LogManager.getRootLogger();
         private Socket clientSocket;
         private InputStream inputStream;
         private OutputStream outputStream;
@@ -31,25 +35,25 @@ public class HTTPServer {
             this.outputStream = connection.getOutputStream();
         }
 
-        @Override
         public void run() {
             try {
                 Request request = new RequestParser().getRequest(inputStream);
-                String response = HttpMethodController.getInstance().executeMethod(request);
+                Response response = HttpMethodController.getInstance().executeMethod(request);
                 writeResponse(response);
             } catch (IOException e) {
-
+                logger.error(e);
             } finally {
                 try {
                     clientSocket.close();
                 } catch (IOException e) {
-
+                    logger.error(e);
                 }
             }
         }
 
-        private void writeResponse(String response) throws IOException {
-            outputStream.write(response.getBytes());
+        private void writeResponse(Response response) throws IOException {
+            outputStream.write(response.getHeader().getBytes());
+            outputStream.write(response.getBody().getBytes());
         }
     }
 }

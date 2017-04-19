@@ -1,6 +1,7 @@
 package com.epam.testServer.method;
 
 import com.epam.testServer.bean.Request;
+import com.epam.testServer.bean.Response;
 import com.epam.testServer.storage.Storage;
 
 /**
@@ -21,17 +22,20 @@ public class HttpMethodDelete extends HttpMethod {
      * server required only correct path to book
      */
     @Override
-    public String executeMethod(Request request) {
-        String response = request.getHttpVersion();
+    public Response executeMethod(Request request) {
+        String responseHeader = request.getHttpVersion();
         try {
             if (request.getPath().matches(PAGE_REG_EXP)) {
-                response += deleteBook(request);
+                responseHeader += deleteBook(request);
             } else {
-                response += PAGE_NOT_FOUND_TEXT;
+                responseHeader += PAGE_NOT_FOUND_TEXT;
             }
         } catch (Exception e) {
-            response += PAGE_NOT_FOUND_TEXT;
+            responseHeader += PAGE_NOT_FOUND_TEXT;
         }
+
+        Response response = new Response();
+        response.setHeader(responseHeader);
         return response;
     }
 

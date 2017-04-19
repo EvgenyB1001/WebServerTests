@@ -2,6 +2,7 @@ package com.epam.testServer.method;
 
 import com.epam.testServer.bean.Book;
 import com.epam.testServer.bean.Request;
+import com.epam.testServer.bean.Response;
 import com.epam.testServer.method.exception.MethodException;
 import com.epam.testServer.storage.Storage;
 import com.epam.testServer.storage.exception.StorageException;
@@ -45,22 +46,24 @@ public class HttpMethodPut extends HttpMethod {
      * Only one book can be updated per request
      */
     @Override
-    public String executeMethod(Request request) {
-        String response = request.getHttpVersion();
+    public Response executeMethod(Request request) {
+        String responseHeader = request.getHttpVersion();
+        Response response = new Response();
         try {
             if (request.getPath().matches(PAGE_REG_EXP)) {
                 String body = request.getBody();
-                response = updateBook(request, body);
+                responseHeader = updateBook(request, body);
             } else {
-                response += PAGE_NOT_FOUND_TEXT;
+                responseHeader += PAGE_NOT_FOUND_TEXT;
             }
         } catch (ParseException | ParserConfigurationException | SAXException | IOException e) {
-            response += SERVER_ERROR_TEXT;
+            responseHeader += SERVER_ERROR_TEXT;
         } catch (StorageException stEx) {
-            response += PAGE_NOT_FOUND_TEXT;
+            responseHeader += PAGE_NOT_FOUND_TEXT;
         } catch (MethodException methEx) {
-            response += WRONG_ATTRIBUTES_TEXT;
+            responseHeader += WRONG_ATTRIBUTES_TEXT;
         }
+        response.setHeader(responseHeader);
         return response;
     }
 

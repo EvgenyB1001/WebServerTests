@@ -1,6 +1,7 @@
 package com.epam.testServer.method;
 
 import com.epam.testServer.bean.Request;
+import com.epam.testServer.bean.Response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +31,8 @@ public class HttpMethodController {
         return instance;
     }
 
-    public String executeMethod(Request request) {
-        String response = null;
+    public Response executeMethod(Request request) {
+        Response response = null;
         for (HttpMethod method : methods) {
             if (method.getMethodName().equals(request.getMethod())) {
                 response = method.executeMethod(request);

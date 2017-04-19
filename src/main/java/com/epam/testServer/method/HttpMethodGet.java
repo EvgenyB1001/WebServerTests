@@ -2,6 +2,7 @@ package com.epam.testServer.method;
 
 import com.epam.testServer.bean.Book;
 import com.epam.testServer.bean.Request;
+import com.epam.testServer.bean.Response;
 import com.epam.testServer.storage.Storage;
 import com.epam.testServer.storage.exception.StorageException;
 import org.json.simple.JSONArray;
@@ -32,32 +33,36 @@ public class HttpMethodGet extends HttpMethod {
     }
 
     @Override
-    public String executeMethod(Request request) {
-        String response = request.getHttpVersion();
+    public Response executeMethod(Request request) {
+        String responseHeader = request.getHttpVersion();
+        Response response = new Response();
+        String body = null;
         try {
             if (request.getPath().equals(ROOT_PATH_TEXT)) {
-                String body = createRootResponseBody(request);
-                response = createResponse(request, response, body);
+                body = createRootResponseBody(request);
+                responseHeader = createResponseHeader(request, responseHeader, body.getBytes().length);
             } else if (request.getPath().matches(PAGE_REG_EXP)) {
-                String body = createBookResponseBody(request);
-                response = createResponse(request, response, body);
+                body = createBookResponseBody(request);
+                responseHeader = createResponseHeader(request, responseHeader, body.getBytes().length);
             } else {
-                response += PAGE_NOT_FOUND_TEXT;
+                responseHeader += PAGE_NOT_FOUND_TEXT;
             }
         } catch (StorageException stEx) {
-            response += PAGE_NOT_FOUND_TEXT;
+            responseHeader += PAGE_NOT_FOUND_TEXT;
         } catch (Exception e) {
-            response += SERVER_ERROR_TEXT;
+            responseHeader += SERVER_ERROR_TEXT;
         }
+        response.setHeader(responseHeader);
+        response.setBody(body);
         return response;
     }
 
-    private String createResponse(Request request, String response, String body) {
+    private String createResponseHeader(Request request, String response, int bodyLength) {
         response += CORRECT_ACTION_ANSWER_TEXT + "\r\n" +
                 SERVER_TEXT + "\r\n" +
                 CONTENT_TYPE_TEXT + request.getParameters().get(CONTENT_TYPE_ATTRIBUTE_NAME) + "\r\n" +
-                CONTENT_LENGTH_TEXT + body.getBytes().length + "\r\n" +
-                CONNECTION_KEEP_ALIVE_TEXT + "\r\n\r\n" + body;
+                CONTENT_LENGTH_TEXT + bodyLength + "\r\n" +
+                CONNECTION_KEEP_ALIVE_TEXT + "\r\n\r\n";
         return response;
     }
 
